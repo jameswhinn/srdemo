@@ -4,6 +4,7 @@ const aws = require('aws-sdk');
 const express = require('express');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
+const bucket = process.env.BUCKET
 
 const app = express();
 
@@ -16,7 +17,7 @@ const s3 = new aws.S3({
 const upload = multer({
     storage: multerS3({
       s3: s3,
-      bucket: process.env.BUCKET,
+      bucket: bucket,
       acl: 'public-read',
       key: function (request, file, cb) {
         console.log(file);
