@@ -8,9 +8,28 @@ const bucket = process.env.BUCKET
 
 const app = express();
 
-// Set S3 endpoint
+  var options = {
+    apiVersion: 'v1', // default
+    endpoint: 'http://127.0.0.1:8100', // default
+  };
+  
+  // get new instance of the client
+  var vault = require("node-vault")(options);
+  
+  vault.write('aws/sts/s3creds')
+  .then((result) => {
+    const roleId = result[0].data.access_key;
+    const secretId = result[1].data.secret_key;
+
+    const accessparams = {
+      accessKeyId: result[0].data.access_key,
+      secretAccessKey: result[1].data.secret_key,
+      sessionToken: result[2].data.security_token,
+    };
+    // Set S3 endpoint
 const s3Endpoint = new aws.Endpoint('s3.eu-west-2.amazonaws.com');
 const s3 = new aws.S3({
+  accessparams: accessparams,
   endpoint: s3Endpoint
 });
 
@@ -55,3 +74,6 @@ app.get('/', function (request, response) {
   app.listen(8080, function () {
     console.log('Server listening on port 8080.');
   });
+
+
+   })
